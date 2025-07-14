@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel="icon" href="data:,">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TradeX - Stock Trading Platform</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>📈 TradeX</h1>
+    <div class="nav">
+      <select id="currencyToggle">
+        <option value="USD">USD ($)</option>
+        <option value="INR">INR (₹)</option>
+      </select>
+      <button class="nav-btn" data-target="home">Home</button>
+      <button class="nav-btn" data-target="portfolio">Portfolio</button>
+      <button class="nav-btn" data-target="orders">Orders</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main>
+<!-- Login Section -->
+ <center>
+<section id="auth" class="auth-section active">
+  <div class="auth-box">
+    <div class="auth-inner">
+      <h2 class="auth-title">Login to TradeX</h2>
+      <input id="auth-username" type="text" placeholder="Username" />
+      <input id="auth-password" type="password" placeholder="Password" />
+      <button id="loginBtn">Login</button>
+      <div class="auth-footer">
+        <p>New here? <a href="#" id="showSignup">Signup</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+</center>
+
+
+
+    <!-- Home Section -->
+    <section id="home" class="hidden">
+      <h2>Market Watch</h2>
+      <div>Wallet: <span id="walletBalance"></span></div>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search stocks..."
+        autocomplete="off"
+      />
+      <div id="stockList" class="stock-list"></div>
+      <!-- 📢 Highlights Card -->
+
+
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="hidden">
+      <h2>Your Portfolio</h2>
+      <div id="portfolioContent"></div>
+      <button class="back-home">Back</button>
+    </section>
+
+    <!-- Orders Section -->
+    <section id="orders" class="hidden">
+      <h2>Order History</h2>
+      <div id="orderContent"></div>
+      <button class="back-home">Back</button>
+    </section>
+  </main>
+
+  <!-- Buy/Sell Modal -->
+  <div id="tradeModal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modalTitle">Trade</h3>
+      <p>Enter quantity and password:</p>
+      <input type="number" id="modalQuantity" placeholder="Quantity" min="1" />
+      <input type="password" id="modalPassword" placeholder="Password" />
+      <div class="modal-actions">
+        <button id="confirmTradeBtn">Confirm</button>
+        <button id="cancelTradeBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<div id="chartModal" class="hidden">
+  <h3 id="chartTitle"></h3>
+
+  <div style="position: relative; width: 100%; height: 300px;">
+    <canvas id="chartCanvas" style="width: 100%; height: 100%;"></canvas>
+  </div>
+
+  <button id="closeChartBtn">Close</button>
+</div>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Main Script -->
+  <script src="script.js"></script>
+
+  </body>
+  </html>
