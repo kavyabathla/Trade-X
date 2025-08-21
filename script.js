@@ -437,3 +437,29 @@ document.addEventListener("DOMContentLoaded", () => {
   usernameInput.addEventListener("keypress", triggerLogin);
   passwordInput.addEventListener("keypress", triggerLogin);
 });
+
+  const loginBtn = document.getElementById("loginBtn");
+  const username = document.getElementById("auth-username");
+  const password = document.getElementById("auth-password");
+  const authSection = document.getElementById("auth");
+  const homeSection = document.getElementById("home");
+  const navButtons = document.getElementById("navButtons");
+
+  loginBtn.addEventListener("click", function () {
+    const user = username.value.trim();
+    const pass = password.value;
+
+    // Basic fake authentication for demo purposes
+    if (user && pass) {
+      // Hide login section and show home
+      authSection.classList.add("hidden");
+      homeSection.classList.remove("hidden");
+
+      // Show nav bar buttons
+      navButtons.classList.remove("hidden");
+    } else {
+      alert("Please enter username and password");
+    }
+  });
+
+ 

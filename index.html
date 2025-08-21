@@ -7,9 +7,124 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <script type="module">
+  // Firebase SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getAnalytics, isSupported as analyticsIsSupported } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+  // Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCHe-qN_UxI76DCqrIiazcAAtLWvOt77sY",
+    authDomain: "trade2102-97eb3.firebaseapp.com",
+    projectId: "trade2102-97eb3",
+    storageBucket: "trade2102-97eb3.firebasestorage.app",
+    messagingSenderId: "46190526546",
+    appId: "1:46190526546:web:c633faa5a4c92183675f8b",
+    measurementId: "G-FRNSLTZ9KR"
+  };
+
+  // Init Firebase
+  const app = initializeApp(firebaseConfig);
+
+  // Init Analytics safely (won't crash on file:// or unsupported envs)
+  analyticsIsSupported()
+    .then((ok) => { if (ok) getAnalytics(app); })
+    .catch((e) => console.log("Analytics not supported here:", e?.message || e));
+
+  // Init Auth
+  const auth = getAuth(app);
+
+  // ---- Auth helpers ----
+  async function registerUser(email, password) {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Signup successful ✅ Now you can log in!");
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
+    }
+  }
+
+  async function loginUser(email, password) {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful 🎉");
+      // Show your existing sections (no UI changes)
+      document.getElementById("auth")?.classList.add("hidden");
+      document.getElementById("home")?.classList.remove("hidden");
+      document.getElementById("navButtons")?.classList.remove("hidden");
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
+    }
+  }
+
+  async function logoutUser() {
+    try {
+      await signOut(auth);
+      alert("Logged out 🚪");
+      // Keep your current flow simple:
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
+    }
+  }
+
+  // Attach listeners **after** DOM is ready (prevents null errors)
+  window.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const emailInput = document.getElementById("auth-username"); // use an EMAIL value here
+    const passInput = document.getElementById("auth-password");
+    const showSignup = document.getElementById("showSignup");
+
+    if (loginBtn) {
+      loginBtn.addEventListener("click", () => {
+        const email = emailInput?.value || "";
+        const password = passInput?.value || "";
+        loginUser(email, password);
+      });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => logoutUser());
+    }
+
+    if (showSignup) {
+      showSignup.addEventListener("click", (e) => {
+        e.preventDefault();
+        const email = prompt("Enter email for signup:");
+        const password = prompt("Enter password (min 6 chars):");
+        if (email && password) registerUser(email, password);
+      });
+    }
+
+    // Keep user signed in across refresh
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Logged in as:", user.email);
+        document.getElementById("auth")?.classList.add("hidden");
+        document.getElementById("home")?.classList.remove("hidden");
+        document.getElementById("navButtons")?.classList.remove("hidden");
+      } else {
+        console.log("No user logged in yet");
+      }
+    });
+  });
+</script>
+
+
   <header>
     <h1>📈 TradeX</h1>
-    <div class="nav">
+    <div class="nav hidden" id="navButtons">
       <select id="currencyToggle">
         <option value="USD">USD ($)</option>
         <option value="INR">INR (₹)</option>
@@ -20,31 +135,111 @@
       <button id="logoutBtn">Logout</button>
     </div>
   </header>
+  
 
   <main>
-<!-- Login Section -->
- <center>
-<section id="auth" class="auth-section active">
-  <div class="auth-box">
-    <div class="auth-inner">
-      <h2 class="auth-title">Login to TradeX</h2>
-      <input id="auth-username" type="text" placeholder="Username" />
-      <input id="auth-password" type="password" placeholder="Password" />
-      <button id="loginBtn">Login</button>
-      <div class="auth-footer">
-        <p>New here? <a href="#" id="showSignup">Signup</a></p>
+  <!-- Landing Page Section -->
+  <section id="landing" class="landing-section active" style="height: 100vh; width: 100% ;display: flex; background-color: white; position: relative; overflow: hidden; margin: 0; padding: 0;">
+    <!-- Animated gradient background -->
+    <div style="position: absolute; inset: 0; z-index: 0; pointer-events: none;">
+      <!-- You can put background gradients or blobs here if you like -->
+    </div>
+
+    <div style="position: relative; z-index: 2; display: flex; width: 100%; align-items: center; justify-content: space-between; padding: 0 60px;">
+      <!-- Left: Headline, subheadline, CTA -->
+      <div style="flex: 1 1 0; min-width: 320px;">
+        <img src="https://img.icons8.com/ios-filled/60/6b7fa7/line-chart.png" alt="TradeX Logo" style="margin-bottom: 24px;">
+        <h1 style="font-size: 2.8em; font-weight: 700; color: #2d3a5c; margin-bottom: 0.3em; letter-spacing: -0.01em;">
+          TradeX – Modern stock trading, <span style="color: #4e54c8;">simplified</span>
+        </h1>
+        <p style="font-size: 1.25em; color: #4e5472; margin-bottom: 2em; line-height: 1.5;">
+          Invest in stocks, track your portfolio, and trade securely with real-time insights.<br>
+          Experience the next-gen platform inspired by the best, built for you.
+        </p>
+        <button id="startTradingBtn" style="
+          background: linear-gradient(90deg, #b6c6e6 0%, #f3d6e3 100%);
+          color: #2d3a5c;
+          border: none;
+          border-radius: 6px;
+          padding: 16px 44px;
+          font-size: 1.18em;
+          font-weight: 600;
+          box-shadow: 0 2px 8px #b6c6e644;
+          cursor: pointer;
+          transition: background 0.2s, transform 0.18s;
+          outline: none;
+          margin-bottom: 18px;
+        " onmouseover="this.style.transform='translateY(-2px) scale(1.03)';" onmouseout="this.style.transform='none';">
+          Get started with TradeX
+        </button>
+        <div style="margin-top: 1.2em; color: #a7b8d8; font-size: 1.08em;">
+          <span>🚀 Invest in top stocks</span> &nbsp;|&nbsp;
+          <span>📊 Interactive charts</span> &nbsp;|&nbsp;
+          <span>🔒 Secure & easy</span>
+        </div>
+      </div>
+
+      <!-- Right: Illustration -->
+      <div style="flex: 1 1 0; min-width: 320px; display: flex; justify-content: center;">
+        <img src="https://zerodha.com/static/images/landing.png" alt="Trading Illustration" style="width: 100%; max-width: 500px; min-width: 260px; border-radius: 18px; box-shadow: 0 8px 32px rgba(180,190,220,0.13); background: #fff;">
       </div>
     </div>
-  </div>
-</section>
-</center>
+
+    <style>
+      @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+      }
+      @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(40px);}
+        100% { opacity: 1; transform: translateY(0);}
+      }
+      @keyframes floatBlob {
+        0% { transform: translateY(0) scale(1);}
+        100% { transform: translateY(-30px) scale(1.08);}
+      }
+      @keyframes floatBlob2 {
+        0% { transform: translateY(0) scale(1);}
+        100% { transform: translateY(24px) scale(1.04);}
+      }
+    </style>
+  </section>
+</main>
 
 
+    <!-- Login Section -->
+    <center>
+    <section id="auth" class="auth-section hidden">
+      <div class="auth-box">
+        <div class="auth-inner">
+          <!-- Logo and subtitle -->
+          <div class="auth-logo">
+            <img src="https://img.icons8.com/ios-filled/100/4e54c8/line-chart.png" alt="TradeX Logo" style="width:60px;height:60px;margin-bottom:10px;">
+            <h2 class="auth-title" style="margin-bottom: 0;">Login to TradeX</h2>
+            <p class="auth-subtitle" style="color:#888;margin-top:4px;margin-bottom:18px;font-size:1.05em;">Your gateway to smarter trading</p>
+          </div>
+          <!-- Social login buttons (visual only) -->
+          <div class="auth-social">
+            <button class="social-btn google"><img src="https://img.icons8.com/color/24/000000/google-logo.png" style="vertical-align:middle;margin-right:6px;">Sign in with Google</button>
+            <button class="social-btn microsoft"><img src="https://img.icons8.com/color/24/000000/microsoft.png" style="vertical-align:middle;margin-right:6px;">Sign in with Microsoft</button>
+          </div>
+          <div class="auth-divider"><span>or</span></div>
+          <!-- Login form -->
+          <input id="auth-username" type="text" placeholder="Username" class="auth-input" />
+          <input id="auth-password" type="password" placeholder="Password" class="auth-input" />
+          <button id="loginBtn" class="auth-login-btn">Login</button>
+          <div class="auth-footer">
+            <p>New here? <a href="#" id="showSignup">Signup</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+    </center>
 
     <!-- Home Section -->
     <section id="home" class="hidden">
-      <h2>Market Watch</h2>
-      <div>Wallet: <span id="walletBalance"></span></div>
+     <div class="marketwatch"><p >    Market Watch    </p></div>
+      <div class="walletbal">Wallet: <span id="walletBalance"></span></div>
       <input
         type="text"
         id="searchInput"
@@ -52,7 +247,7 @@
         autocomplete="off"
       />
       <div id="stockList" class="stock-list"></div>
-      <!-- 📢 Highlights Card -->
+      <!--  Highlights Card -->
 
 
     </section>
@@ -100,6 +295,22 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Main Script -->
   <script src="script.js"></script>
-
+  <script>
+    // Landing page logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const landing = document.getElementById('landing');
+      const auth = document.getElementById('auth');
+      const startBtn = document.getElementById('startTradingBtn');
+      if (startBtn) {
+        startBtn.addEventListener('click', function() {
+          landing.classList.add('hidden');
+          landing.classList.remove('active');
+          auth.classList.remove('hidden');
+          auth.classList.add('active');
+        });
+      }
+    });
+  </script>
   </body>
+  </html>
   </html>
